@@ -542,6 +542,10 @@ private:
     void asyncThreadLoop();
 };
 
+bool readLines(FileAccess& ifAccess, string_vector& destination);
+bool readLines(InputStreamAccess& isAccess, string_vector& destination);
+bool readLines(const std::string& input, string_vector& destination);
+
 bool wildcardMatch(const char* pszString, const char* pszMatch);
 bool wildcardMatch(const char* string, const string_vector &patterns);
 
