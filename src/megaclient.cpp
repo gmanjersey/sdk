@@ -2701,7 +2701,7 @@ void MegaClient::exec()
                                                 }
                                                 scanfailed = true;
 
-                                                sync->scan(&sync->localroot->localname, NULL);
+                                                sync->scan(&sync->localroot->localname, NULL, sync->localroot.get());
                                                 sync->dirnotify->error = 0;
                                                 sync->fullscan = true;
                                                 sync->scanseqno++;
@@ -12256,7 +12256,7 @@ error MegaClient::addsync(SyncConfig syncConfig, const char* debris, string* loc
                 }
             }
 
-            if (sync->scan(&rootpath, fa.get()))
+            if (sync->scan(&rootpath, fa.get(), sync->localroot.get()))
             {
                 syncsup = false;
                 e = API_OK;
@@ -12387,14 +12387,15 @@ bool MegaClient::syncdown(LocalNode* l, string* localpath, bool rubbish)
              && !(*it)->attrstring
              && (ait = (*it)->attrs.map.find('n')) != (*it)->attrs.map.end()
              && ait->second.size())
-         && (l->parent || l->sync->debris != ait->second))
+             && (l->parent || l->sync->debris != ait->second))
         {
             size_t t = localpath->size();
             string localname = ait->second;
             fsaccess->name2local(&localname, localpath);
             localpath->append(fsaccess->localseparator);
             localpath->append(localname);
-            if (app->sync_syncable(l->sync, ait->second.c_str(), localpath, *it))
+            if (app->sync_syncable(l->sync, ait->second.c_str(), localpath, *it)
+                && l->isIncluded(ait->second.c_str()))
             {
                 addchild(&nchildren, &ait->second, *it, &strings, &l->sync->localdebris);
             }
